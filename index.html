@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --stage:#1A1230; --stage-2:#241A42; --ink:#F6EFE6; --dim:#8C7FA8;
+  --stage:#1A1230; --stage-2:#241A42; --line:#2E2352; --ink:#F6EFE6; --dim:#8C7FA8;
   --spot:#FFD166; --warn:#FF8A7A;
   --font:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;
   box-sizing:border-box;
@@ -24,30 +24,55 @@ button{cursor:pointer;border:0;background:none}
 :focus-visible{outline:2px solid var(--spot);outline-offset:3px;border-radius:6px}
 .view{height:100%;display:flex;flex-direction:column}
 [hidden]{display:none!important}
+a{color:var(--spot)}
 
-/* Recherche */
-#search{padding:28px 20px 0;max-width:640px;margin:0 auto;width:100%}
-#search h1{font-size:clamp(2.6rem,11vw,4rem);font-weight:800;line-height:.95;letter-spacing:-.03em;margin-bottom:24px}
-#search h1 span{display:block;color:var(--dim);font-weight:400}
+/* Accueil */
+#search{padding:24px 20px 0;max-width:640px;margin:0 auto;width:100%}
+.top{display:flex;justify-content:space-between;align-items:flex-start}
+#search h1{font-size:clamp(2.6rem,11vw,4rem);font-weight:800;line-height:.95;letter-spacing:-.03em;margin-bottom:22px}
+#search h1 span{display:block;color:var(--dim);font-weight:400;font-size:.55em;letter-spacing:-.01em;margin-top:8px}
+#gear{font-size:1.4rem;padding:6px;color:var(--dim)}
+
+#listen{display:flex;align-items:center;gap:16px;width:100%;padding:14px;border-radius:20px;background:var(--stage-2);border:1px solid #3A2D63;margin-bottom:14px;text-align:left}
+.mic{flex:none;width:64px;height:64px;border-radius:50%;background:var(--spot);color:var(--stage);display:grid;place-items:center;font-size:1.7rem;position:relative}
+#listen b{display:block;font-size:1.15rem}
+#listen small{color:var(--dim)}
+#listen.rec .mic::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:3px solid var(--spot);animation:pulse 1.2s ease-out infinite}
+#listen:disabled{cursor:default}
+@keyframes pulse{from{transform:scale(.9);opacity:1}to{transform:scale(1.35);opacity:0}}
+
 form{display:flex;gap:8px}
-#q{flex:1;min-width:0;background:var(--stage-2);border:1px solid #3A2D63;border-radius:14px;padding:14px 16px;font-size:1.05rem}
+#q{flex:1;min-width:0;background:transparent;border:1px solid #3A2D63;border-radius:14px;padding:13px 16px;font-size:1rem}
 #q::placeholder{color:var(--dim)}
-.btn-main{background:var(--spot);color:var(--stage);font-weight:800;border-radius:14px;padding:0 20px}
-#status{color:var(--dim);margin:18px 2px 8px;min-height:1.4em}
+.btn-main{background:#33275A;font-weight:600;border-radius:14px;padding:0 18px}
+#status{color:var(--dim);margin:16px 2px 8px;min-height:1.4em}
 #status.err{color:var(--warn)}
 #results{list-style:none;padding:0 0 24px;overflow-y:auto;flex:1}
-#results li button{width:100%;text-align:left;padding:14px 4px;border-bottom:1px solid #2E2352;display:grid;grid-template-columns:1fr auto;gap:2px 12px}
+#results li button{width:100%;text-align:left;padding:14px 4px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:2px 12px}
 .r-title{font-weight:600;font-size:1.1rem}
 .r-meta{color:var(--dim);font-size:.9rem;grid-column:1}
 .r-tag{grid-row:1/3;grid-column:2;align-self:center;font-size:.8rem;color:var(--dim)}
 .r-tag.sync{color:var(--spot)}
 
+/* Réglages */
+#settings{position:fixed;inset:0;background:rgba(10,6,22,.75);display:grid;place-items:end center;z-index:10}
+#settings .sheet{background:var(--stage-2);width:100%;max-width:640px;border-radius:22px 22px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom,0px))}
+#settings h2{font-size:1.4rem;margin-bottom:8px}
+#settings p{color:var(--dim);line-height:1.45;margin-bottom:14px}
+#token{width:100%;background:var(--stage);border:1px solid #3A2D63;border-radius:12px;padding:13px 14px;margin-bottom:12px}
+.row{display:flex;gap:8px;justify-content:flex-end}
+.row button{padding:12px 18px;border-radius:12px;font-weight:600}
+#saveTok{background:var(--spot);color:var(--stage);font-weight:800}
+
 /* Karaoké */
-#player header{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #2E2352}
+#player header{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}
 #back{font-size:1.4rem;padding:4px 8px}
-#now{min-width:0}
+#now{min-width:0;flex:1}
 #now b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #now small{color:var(--dim)}
+#relisten{width:44px;height:44px;border-radius:50%;background:#33275A;font-size:1.2rem;flex:none;position:relative}
+#relisten.rec::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--spot);animation:pulse 1.2s ease-out infinite}
+#hint{color:var(--dim);font-size:.85rem;text-align:center;padding:6px 16px 0}
 #lyrics{flex:1;overflow-y:auto;padding:40vh 22px;scroll-behavior:smooth}
 .line{display:block;width:100%;text-align:left;font-size:clamp(1.3rem,5.4vw,2rem);font-weight:600;line-height:1.25;color:var(--dim);opacity:.45;padding:10px 0;transition:color .25s,opacity .25s,transform .25s;transform-origin:left center}
 .line.past{opacity:.25}
@@ -60,15 +85,21 @@ form{display:flex;gap:8px}
 .off{display:flex;align-items:center;gap:6px}
 #offv{min-width:58px;text-align:center;font-variant-numeric:tabular-nums;color:var(--dim);font-size:.9rem}
 #clock{font-variant-numeric:tabular-nums;color:var(--dim);min-width:52px;text-align:right}
-#hint{color:var(--dim);font-size:.85rem;text-align:center;padding:6px 16px 0}
 
-@media (prefers-reduced-motion:reduce){#lyrics{scroll-behavior:auto}.line{transition:none}}
+@media (prefers-reduced-motion:reduce){#lyrics{scroll-behavior:auto}.line{transition:none}#listen.rec .mic::after,#relisten.rec::after{animation:none;opacity:1}}
 </style>
 </head>
 <body>
 
 <section id="search" class="view">
-  <h1>Chante-la.<span>Tape un titre.</span></h1>
+  <div class="top">
+    <h1>Chante-la.<span>Fais écouter la musique, ou tape un titre.</span></h1>
+    <button id="gear" aria-label="Réglages">⚙︎</button>
+  </div>
+  <button id="listen">
+    <span class="mic" aria-hidden="true">🎤</span>
+    <span><b id="listenTitle">Reconnaître la musique</b><small id="listenSub">Écoute 8 secondes, puis lance les paroles au bon moment</small></span>
+  </button>
   <form id="f">
     <input id="q" type="search" placeholder="Titre et artiste" autocomplete="off" enterkeyhint="search" aria-label="Titre et artiste">
     <button class="btn-main" type="submit">Chercher</button>
@@ -79,10 +110,11 @@ form{display:flex;gap:8px}
 
 <section id="player" class="view" hidden>
   <header>
-    <button id="back" aria-label="Retour à la recherche">←</button>
+    <button id="back" aria-label="Retour à l'accueil">←</button>
     <div id="now"><b id="t-title"></b><small id="t-artist"></small></div>
+    <button id="relisten" aria-label="Réécouter pour recaler ou changer de musique">🎤</button>
   </header>
-  <p id="hint">Lance le son sur Spotify puis appuie sur ▶. Décalé ? Touche la ligne qu'on entend.</p>
+  <p id="hint">Décalé ? Touche la ligne qu'on entend, ou réécoute avec 🎤.</p>
   <div id="lyrics"></div>
   <div id="controls">
     <button class="ctl" id="restart" aria-label="Revenir au début">⟲</button>
@@ -96,14 +128,49 @@ form{display:flex;gap:8px}
   </div>
 </section>
 
+<div id="settings" hidden>
+  <div class="sheet" role="dialog" aria-labelledby="setTitle">
+    <h2 id="setTitle">Clé de reconnaissance</h2>
+    <p>La reconnaissance utilise AudD. Crée un compte sur <a href="https://dashboard.audd.io" target="_blank" rel="noopener">dashboard.audd.io</a>, copie ton API token et colle-le ici. Il reste uniquement sur cet appareil.</p>
+    <input id="token" type="text" placeholder="API token AudD" autocomplete="off" spellcheck="false">
+    <div class="row">
+      <button id="closeSet">Annuler</button>
+      <button id="saveTok">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const $ = s => document.querySelector(s);
-const API = "https://lrclib.net/api/search?q=";
+const LRC = "https://lrclib.net/api/search?";
+const REC_SECONDS = 8;
 
 let lines = [], els = [], cur = -1;
-let playing = false, startAt = 0, pausedAt = 0, offset = 0, raf = 0, lock = null;
+let playing = false, startAt = 0, pausedAt = 0, offset = 0, raf = 0, lock = null, busy = false;
 
-// ---------- Recherche ----------
+// ---------- Stockage local (clé AudD) ----------
+const store = {
+  get(k){ try { return localStorage.getItem(k) || ""; } catch(e){ return ""; } },
+  set(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
+};
+
+// ---------- Réseau ----------
+async function fetchRetry(url, opts, tries = 3) {
+  for (let i = 1; i <= tries; i++) {
+    try {
+      const res = await fetch(url, opts);
+      if (res.ok) return await res.json();
+      if (res.status < 500) throw new Error("fatal " + res.status);
+    } catch (e) {
+      if (String(e.message).startsWith("fatal") || i === tries) throw e;
+    }
+    if (i < tries) await new Promise(r => setTimeout(r, 1500 * i));
+  }
+}
+
+function setStatus(msg, err) { const s = $("#status"); s.textContent = msg; s.classList.toggle("err", !!err); }
+
+// ---------- Recherche manuelle ----------
 $("#f").addEventListener("submit", async e => {
   e.preventDefault();
   const q = $("#q").value.trim();
@@ -111,7 +178,7 @@ $("#f").addEventListener("submit", async e => {
   setStatus("Recherche…");
   $("#results").innerHTML = "";
   try {
-    const data = await fetchRetry(API + encodeURIComponent(q));
+    const data = await fetchRetry(LRC + "q=" + encodeURIComponent(q));
     if (!data.length) return setStatus("Aucun résultat. Essaie avec le titre et l'artiste.", true);
     data.sort((a, b) => !!b.syncedLyrics - !!a.syncedLyrics);
     setStatus(data.length + " résultat" + (data.length > 1 ? "s" : ""));
@@ -124,36 +191,114 @@ $("#f").addEventListener("submit", async e => {
       const tag = b.querySelector(".r-tag");
       if (s.syncedLyrics) { tag.textContent = "synchro"; tag.classList.add("sync"); }
       else tag.textContent = s.instrumental ? "instru" : "texte seul";
-      b.onclick = () => open(s);
+      b.onclick = () => { open(s); };
       li.appendChild(b);
       $("#results").appendChild(li);
     }
   } catch (err) {
-    setStatus(navigator.onLine
-      ? "LRCLIB est surchargé en ce moment. Réessaie dans quelques minutes."
-      : "Pas de connexion internet.", true);
+    setStatus(navigator.onLine ? "LRCLIB est surchargé en ce moment. Réessaie dans quelques minutes." : "Pas de connexion internet.", true);
   }
 });
 
-// 3 essais espacés : LRCLIB renvoie parfois 503 quand il est surchargé
-async function fetchRetry(url, tries = 3) {
-  for (let i = 1; i <= tries; i++) {
-    try {
-      const res = await fetch(url);
-      if (res.ok) return await res.json();
-      if (res.status < 500) throw new Error("fatal " + res.status);
-    } catch (e) {
-      if (String(e.message).startsWith("fatal") || i === tries) throw e;
-    }
-    if (i < tries) {
-      setStatus(`Serveur occupé, nouvel essai (${i + 1}/${tries})…`);
-      await new Promise(r => setTimeout(r, 1500 * i));
-    }
-  }
-  throw new Error("échec");
+// ---------- Reconnaissance (micro + AudD) ----------
+async function record(seconds) {
+  const stream = await navigator.mediaDevices.getUserMedia({
+    audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+  });
+  const rec = new MediaRecorder(stream);
+  const chunks = [];
+  rec.ondataavailable = e => e.data.size && chunks.push(e.data);
+  const done = new Promise(r => rec.onstop = r);
+  const t0 = performance.now();
+  rec.start();
+  await new Promise(r => setTimeout(r, seconds * 1000));
+  rec.stop(); await done;
+  stream.getTracks().forEach(t => t.stop());
+  return { blob: new Blob(chunks, { type: rec.mimeType || "audio/webm" }), t0 };
 }
 
-function setStatus(msg, err) { const s = $("#status"); s.textContent = msg; s.classList.toggle("err", !!err); }
+async function recognize(say) {
+  const token = store.get("auddToken");
+  if (!token) { openSettings(); throw new Error("Ajoute ta clé AudD pour activer la reconnaissance."); }
+
+  let clip;
+  try { say("J'écoute…", `Approche le téléphone de la musique (${REC_SECONDS} s)`); clip = await record(REC_SECONDS); }
+  catch (e) { throw new Error("Accès au micro refusé. Autorise le micro pour ce site dans les réglages du navigateur."); }
+
+  say("Je cherche…", "Identification du morceau");
+  const fd = new FormData();
+  fd.append("api_token", token);
+  fd.append("file", clip.blob, "clip." + (clip.blob.type.includes("mp4") ? "m4a" : "webm"));
+  let r;
+  try { r = await (await fetch("https://api.audd.io/", { method: "POST", body: fd })).json(); }
+  catch (e) { throw new Error("Impossible de joindre AudD. Vérifie ta connexion."); }
+  if (r.status === "error") throw new Error("AudD : " + (r.error?.error_message || "erreur inconnue"));
+  if (!r.result) throw new Error("Morceau pas reconnu. Rapproche-toi de la musique et réessaie.");
+
+  const { artist, title, timecode } = r.result;
+  say("Trouvé !", `${title} — ${artist}. Je charge les paroles…`);
+  const song = await findLyrics(artist, title);
+  if (!song) throw new Error(`Reconnu : ${title} — ${artist}, mais pas de paroles sur LRCLIB.`);
+  return { song, pos: tc(timecode), t0: clip.t0 };
+}
+
+async function findLyrics(artist, title) {
+  const clean = s => s.replace(/\s*[\(\[].*?[\)\]]/g, "").replace(/\s+-\s+.*$/, "").trim();
+  const tries = [
+    "track_name=" + encodeURIComponent(clean(title)) + "&artist_name=" + encodeURIComponent(artist.split(/,|&| feat\.? /i)[0].trim()),
+    "q=" + encodeURIComponent(clean(title) + " " + artist)
+  ];
+  let best = null;
+  for (const qs of tries) {
+    try {
+      const data = await fetchRetry(LRC + qs);
+      const synced = data.find(d => d.syncedLyrics);
+      if (synced) return synced;
+      best = best || data[0];
+    } catch (e) {}
+  }
+  return best;
+}
+
+async function listenAndPlay(fromPlayer) {
+  if (busy) return;
+  busy = true;
+  const btn = fromPlayer ? $("#relisten") : $("#listen");
+  btn.classList.add("rec"); btn.disabled = true;
+  const say = fromPlayer
+    ? (a, b) => { $("#hint").hidden = false; $("#hint").textContent = a + " " + b; }
+    : (a, b) => { $("#listenTitle").textContent = a; $("#listenSub").textContent = b; setStatus(""); };
+  try {
+    const { song, pos, t0 } = await recognize(say);
+    open(song);
+    if (lines.length) {
+      // position actuelle = position du début de l'extrait + temps écoulé depuis
+      pausedAt = pos + (performance.now() - t0) / 1000;
+      play();
+    }
+  } catch (e) {
+    if (fromPlayer) { $("#hint").textContent = e.message; }
+    else setStatus(e.message, true);
+  } finally {
+    busy = false;
+    btn.classList.remove("rec"); btn.disabled = false;
+    $("#listenTitle").textContent = "Reconnaître la musique";
+    $("#listenSub").textContent = "Écoute 8 secondes, puis lance les paroles au bon moment";
+  }
+}
+$("#listen").onclick = () => listenAndPlay(false);
+$("#relisten").onclick = () => listenAndPlay(true);
+
+// ---------- Réglages ----------
+function openSettings() { $("#token").value = store.get("auddToken"); $("#settings").hidden = false; $("#token").focus(); }
+$("#gear").onclick = openSettings;
+$("#closeSet").onclick = () => $("#settings").hidden = true;
+$("#settings").onclick = e => { if (e.target.id === "settings") $("#settings").hidden = true; };
+$("#saveTok").onclick = () => {
+  store.set("auddToken", $("#token").value.trim());
+  $("#settings").hidden = true;
+  setStatus("Clé enregistrée. Appuie sur 🎤 pour reconnaître une musique.");
+};
 
 // ---------- Parsing LRC ----------
 function parseLRC(lrc) {
@@ -179,6 +324,7 @@ function open(song) {
   const synced = lines.length > 0;
   $("#controls").hidden = !synced;
   $("#hint").hidden = !synced;
+  $("#hint").textContent = "Décalé ? Touche la ligne qu'on entend, ou réécoute avec 🎤.";
   if (synced) {
     lines.forEach((l, i) => {
       const b = document.createElement("button");
@@ -214,7 +360,7 @@ function tick() {
 function play() {
   startAt = performance.now() - pausedAt * 1000;
   playing = true; $("#play").textContent = "❚❚"; $("#play").setAttribute("aria-label", "Pause");
-  wake(true); tick();
+  wake(true); cur = -1; tick();
 }
 function stop() {
   if (playing) pausedAt = now();
@@ -224,7 +370,7 @@ function stop() {
 }
 function reset() { pausedAt = 0; offset = 0; cur = -1; showOff(); $("#clock").textContent = "0:00"; }
 
-// Touche une ligne = "on est ici maintenant" : recale le chrono dessus
+// Touche une ligne = "on est ici maintenant"
 function jump(i) {
   offset = lines[i].t - now();
   showOff(); cur = -1;
@@ -239,7 +385,7 @@ $("#minus").onclick = () => nudge(-0.5);
 $("#restart").onclick = () => { const was = playing; stop(); reset(); els.forEach(e => e.classList.remove("on", "past")); $("#lyrics").scrollTop = 0; if (was) play(); };
 $("#back").onclick = () => { stop(); $("#player").hidden = true; $("#search").hidden = false; };
 
-// Garde l'écran allumé pendant la lecture
+// Écran allumé pendant la lecture
 async function wake(on) {
   try {
     if (on && "wakeLock" in navigator) lock = await navigator.wakeLock.request("screen");
@@ -249,6 +395,7 @@ async function wake(on) {
 document.addEventListener("visibilitychange", () => { if (playing && document.visibilityState === "visible") wake(true); });
 
 function fmt(s) { s = Math.floor(s); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }
+function tc(str) { if (!str) return 0; return String(str).split(":").reduce((a, v) => a * 60 + parseFloat(v), 0); }
 </script>
 </body>
 </html>
