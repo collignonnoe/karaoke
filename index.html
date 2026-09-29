@@ -111,9 +111,7 @@ $("#f").addEventListener("submit", async e => {
   setStatus("Recherche…");
   $("#results").innerHTML = "";
   try {
-    const res = await fetch(API + encodeURIComponent(q));
-    if (!res.ok) throw new Error(res.status);
-    const data = await res.json();
+    const data = await fetchRetry(API + encodeURIComponent(q));
     if (!data.length) return setStatus("Aucun résultat. Essaie avec le titre et l'artiste.", true);
     data.sort((a, b) => !!b.syncedLyrics - !!a.syncedLyrics);
     setStatus(data.length + " résultat" + (data.length > 1 ? "s" : ""));
@@ -131,9 +129,29 @@ $("#f").addEventListener("submit", async e => {
       $("#results").appendChild(li);
     }
   } catch (err) {
-    setStatus("Impossible de joindre LRCLIB. Vérifie ta connexion et réessaie.", true);
+    setStatus(navigator.onLine
+      ? "LRCLIB est surchargé en ce moment. Réessaie dans quelques minutes."
+      : "Pas de connexion internet.", true);
   }
 });
+
+// 3 essais espacés : LRCLIB renvoie parfois 503 quand il est surchargé
+async function fetchRetry(url, tries = 3) {
+  for (let i = 1; i <= tries; i++) {
+    try {
+      const res = await fetch(url);
+      if (res.ok) return await res.json();
+      if (res.status < 500) throw new Error("fatal " + res.status);
+    } catch (e) {
+      if (String(e.message).startsWith("fatal") || i === tries) throw e;
+    }
+    if (i < tries) {
+      setStatus(`Serveur occupé, nouvel essai (${i + 1}/${tries})…`);
+      await new Promise(r => setTimeout(r, 1500 * i));
+    }
+  }
+  throw new Error("échec");
+}
 
 function setStatus(msg, err) { const s = $("#status"); s.textContent = msg; s.classList.toggle("err", !!err); }
 
