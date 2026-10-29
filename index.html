@@ -131,7 +131,7 @@ form{display:flex;gap:8px}
 <div id="settings" hidden>
   <div class="sheet" role="dialog" aria-labelledby="setTitle">
     <h2 id="setTitle">Clé de reconnaissance</h2>
-    <p>La reconnaissance utilise AudD. Crée un compte sur <a href="https://dashboard.audd.io" target="_blank" rel="noopener">dashboard.audd.io</a>, copie ton API token et colle-le ici. Il reste uniquement sur cet appareil.</p>
+    <p>Optionnel : la reconnaissance marche sans clé (limite quotidienne). Pour un usage illimité, crée un compte sur <a href="https://dashboard.audd.io" target="_blank" rel="noopener">dashboard.audd.io</a>, copie ton API token et colle-le ici. Il reste uniquement sur cet appareil.</p>
     <input id="token" type="text" placeholder="API token AudD" autocomplete="off" spellcheck="false">
     <div class="row">
       <button id="closeSet">Annuler</button>
@@ -144,6 +144,8 @@ form{display:flex;gap:8px}
 const $ = s => document.querySelector(s);
 const LRC = "https://lrclib.net/api/search?";
 const REC_SECONDS = 8;
+// URL de ton mini-serveur Cloudflare (à remplacer après le déploiement)
+const WORKER_URL = "https://karaoke-audd.TONPSEUDO.workers.dev";
 
 let lines = [], els = [], cur = -1;
 let playing = false, startAt = 0, pausedAt = 0, offset = 0, raf = 0, lock = null, busy = false;
@@ -218,8 +220,9 @@ async function record(seconds) {
 }
 
 async function recognize(say) {
+  // Clé perso (réglages) => appel direct à AudD ; sinon => mini-serveur qui cache la clé
   const token = store.get("auddToken");
-  if (!token) { openSettings(); throw new Error("Ajoute ta clé AudD pour activer la reconnaissance."); }
+  if (!token && WORKER_URL.includes("TONPSEUDO")) { openSettings(); throw new Error("Reconnaissance pas encore configurée."); }
 
   let clip;
   try { say("J'écoute…", `Approche le téléphone de la musique (${REC_SECONDS} s)`); clip = await record(REC_SECONDS); }
@@ -227,12 +230,12 @@ async function recognize(say) {
 
   say("Je cherche…", "Identification du morceau");
   const fd = new FormData();
-  fd.append("api_token", token);
+  if (token) fd.append("api_token", token);
   fd.append("file", clip.blob, "clip." + (clip.blob.type.includes("mp4") ? "m4a" : "webm"));
   let r;
-  try { r = await (await fetch("https://api.audd.io/", { method: "POST", body: fd })).json(); }
-  catch (e) { throw new Error("Impossible de joindre AudD. Vérifie ta connexion."); }
-  if (r.status === "error") throw new Error("AudD : " + (r.error?.error_message || "erreur inconnue"));
+  try { r = await (await fetch(token ? "https://api.audd.io/" : WORKER_URL, { method: "POST", body: fd })).json(); }
+  catch (e) { throw new Error("Impossible de joindre le serveur de reconnaissance. Vérifie ta connexion."); }
+  if (r.status === "error") throw new Error(r.error?.error_message || "Erreur de reconnaissance.");
   if (!r.result) throw new Error("Morceau pas reconnu. Rapproche-toi de la musique et réessaie.");
 
   const { artist, title, timecode } = r.result;
