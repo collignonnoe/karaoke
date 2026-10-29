@@ -3,138 +3,171 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#1A1230">
-<title>Karaoké</title>
+<meta name="theme-color" content="#F3EEE4">
+<title>Chante-la</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <style>
 :root{
-  --stage:#1A1230; --stage-2:#241A42; --line:#2E2352; --ink:#F6EFE6; --dim:#8C7FA8;
-  --spot:#FFD166; --warn:#FF8A7A;
-  --font:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;
-  box-sizing:border-box;
-  padding-top:env(safe-area-inset-top,0px);
-  padding-bottom:env(safe-area-inset-bottom,0px);
+  --paper:#F3EEE4; --paper-2:#EAE3D5; --ink:#1C1A16; --muted:#8A8378; --rule:#D6CDBC;
+  --red:#D2462A; --red-ink:#A8331C;
+  --serif:"Instrument Serif",Georgia,"Times New Roman",serif;
+  --sans:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
-*,*::before,*::after{box-sizing:inherit;margin:0}
+*,*::before,*::after{box-sizing:border-box;margin:0}
 html,body{height:100%}
-body{background:var(--stage);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased;overflow:hidden}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 button,input{font:inherit;color:inherit}
 button{cursor:pointer;border:0;background:none}
-:focus-visible{outline:2px solid var(--spot);outline-offset:3px;border-radius:6px}
-.view{height:100%;display:flex;flex-direction:column}
+:focus-visible{outline:2px solid var(--red);outline-offset:3px;border-radius:4px}
 [hidden]{display:none!important}
-a{color:var(--spot)}
+a{color:var(--red-ink)}
+svg{display:block}
+.view{height:100%;display:flex;flex-direction:column}
+.wrap{max-width:620px;margin:0 auto;width:100%;padding:0 20px}
 
-/* Accueil */
-#search{padding:24px 20px 0;max-width:640px;margin:0 auto;width:100%}
-.top{display:flex;justify-content:space-between;align-items:flex-start}
-#search h1{font-size:clamp(2.6rem,11vw,4rem);font-weight:800;line-height:.95;letter-spacing:-.03em;margin-bottom:22px}
-#search h1 span{display:block;color:var(--dim);font-weight:400;font-size:.55em;letter-spacing:-.01em;margin-top:8px}
-#gear{font-size:1.4rem;padding:6px;color:var(--dim)}
+/* ---------- Accueil ---------- */
+#home .bar{display:flex;justify-content:space-between;align-items:center;padding:16px 0 0;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+#keyBtn{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:6px 0;border-bottom:1px solid var(--rule)}
+#home h1{font-family:var(--serif);font-weight:400;font-size:clamp(3.2rem,15vw,5.2rem);line-height:.9;letter-spacing:-.02em;margin:28px 0 10px}
+#home h1 i{color:var(--red)}
+.lede{color:var(--muted);font-size:1.02rem;line-height:1.45;max-width:30ch;margin-bottom:28px}
 
-#listen{display:flex;align-items:center;gap:16px;width:100%;padding:14px;border-radius:20px;background:var(--stage-2);border:1px solid #3A2D63;margin-bottom:14px;text-align:left}
-.mic{flex:none;width:64px;height:64px;border-radius:50%;background:var(--spot);color:var(--stage);display:grid;place-items:center;font-size:1.7rem;position:relative}
-#listen b{display:block;font-size:1.15rem}
-#listen small{color:var(--dim)}
-#listen.rec .mic::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:3px solid var(--spot);animation:pulse 1.2s ease-out infinite}
+#listen{display:flex;align-items:center;gap:18px;width:100%;text-align:left;padding:4px 0}
+.rec{flex:none;width:76px;height:76px;border-radius:50%;background:var(--red);display:grid;place-items:center;position:relative;
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
+.rec::before{content:"";width:22px;height:22px;border-radius:50%;background:var(--paper)}
+#listen:active .rec{transform:translateY(1px)}
+#listen.on .rec::before{border-radius:4px;width:20px;height:20px}
+#listen.on .rec::after{content:"";position:absolute;inset:-7px;border-radius:50%;border:2px solid var(--red);animation:ring 1.3s ease-out infinite}
+@keyframes ring{from{transform:scale(.92);opacity:.9}to{transform:scale(1.3);opacity:0}}
+#listen b{display:block;font-weight:700;font-size:1.15rem}
+#listen small{display:block;color:var(--muted);font-size:.92rem;margin-top:2px;line-height:1.35}
 #listen:disabled{cursor:default}
-@keyframes pulse{from{transform:scale(.9);opacity:1}to{transform:scale(1.35);opacity:0}}
 
-form{display:flex;gap:8px}
-#q{flex:1;min-width:0;background:transparent;border:1px solid #3A2D63;border-radius:14px;padding:13px 16px;font-size:1rem}
-#q::placeholder{color:var(--dim)}
-.btn-main{background:#33275A;font-weight:600;border-radius:14px;padding:0 18px}
-#status{color:var(--dim);margin:16px 2px 8px;min-height:1.4em}
-#status.err{color:var(--warn)}
-#results{list-style:none;padding:0 0 24px;overflow-y:auto;flex:1}
-#results li button{width:100%;text-align:left;padding:14px 4px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:2px 12px}
-.r-title{font-weight:600;font-size:1.1rem}
-.r-meta{color:var(--dim);font-size:.9rem;grid-column:1}
-.r-tag{grid-row:1/3;grid-column:2;align-self:center;font-size:.8rem;color:var(--dim)}
-.r-tag.sync{color:var(--spot)}
+.quota{display:flex;align-items:center;gap:10px;margin:18px 0 0 94px;font-size:.85rem;color:var(--muted)}
+.ticks{display:flex;gap:4px}
+.ticks span{width:5px;height:16px;border-radius:1px;background:var(--red);transform:skewX(-8deg)}
+.ticks span.used{background:transparent;box-shadow:inset 0 0 0 1.5px var(--rule)}
 
-/* Réglages */
-#settings{position:fixed;inset:0;background:rgba(10,6,22,.75);display:grid;place-items:end center;z-index:10}
-#settings .sheet{background:var(--stage-2);width:100%;max-width:640px;border-radius:22px 22px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom,0px))}
-#settings h2{font-size:1.4rem;margin-bottom:8px}
-#settings p{color:var(--dim);line-height:1.45;margin-bottom:14px}
-#token{width:100%;background:var(--stage);border:1px solid #3A2D63;border-radius:12px;padding:13px 14px;margin-bottom:12px}
-.row{display:flex;gap:8px;justify-content:flex-end}
-.row button{padding:12px 18px;border-radius:12px;font-weight:600}
-#saveTok{background:var(--spot);color:var(--stage);font-weight:800}
+.or{display:flex;align-items:center;gap:12px;color:var(--muted);font-family:var(--serif);font-style:italic;font-size:1.1rem;margin:30px 0 12px}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--rule)}
 
-/* Karaoké */
-#player header{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}
-#back{font-size:1.4rem;padding:4px 8px}
+form{display:flex;align-items:flex-end;gap:14px;border-bottom:1.5px solid var(--ink)}
+#q{flex:1;min-width:0;background:transparent;border:0;padding:12px 0 10px;font-size:1.1rem}
+#q::placeholder{color:var(--muted)}
+#q:focus{outline:none}
+form:focus-within{border-color:var(--red)}
+.go{font-weight:700;padding:12px 0 10px;color:var(--red-ink)}
+#status{color:var(--muted);margin:14px 0 4px;min-height:1.4em;font-size:.92rem}
+#status.err{color:var(--red-ink)}
+#results{list-style:none;padding:0 0 28px;overflow-y:auto;flex:1;counter-reset:n}
+#results li{counter-increment:n}
+#results button{width:100%;text-align:left;padding:14px 0;border-bottom:1px solid var(--rule);display:grid;grid-template-columns:2.2em 1fr auto;gap:0 10px;align-items:baseline}
+#results button::before{content:counter(n,decimal-leading-zero);font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.r-title{font-family:var(--serif);font-size:1.35rem;line-height:1.15}
+.r-meta{grid-column:2;color:var(--muted);font-size:.88rem;margin-top:2px}
+.r-tag{grid-column:3;grid-row:1;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.r-tag.sync{color:var(--red-ink)}
+
+/* ---------- Clé perso ---------- */
+#sheet{position:fixed;inset:0;background:rgba(28,26,22,.35);display:grid;place-items:end center;z-index:10}
+#sheet .in{background:var(--paper);width:100%;max-width:620px;border-top:1.5px solid var(--ink);padding:22px 20px calc(22px + env(safe-area-inset-bottom,0px))}
+#sheet h2{font-family:var(--serif);font-weight:400;font-size:1.8rem;margin-bottom:6px}
+#sheet p{color:var(--muted);line-height:1.45;margin-bottom:16px;font-size:.95rem}
+#token{width:100%;background:transparent;border:0;border-bottom:1.5px solid var(--ink);padding:10px 0;margin-bottom:18px;font-family:ui-monospace,Menlo,monospace;font-size:.9rem}
+#token:focus{outline:none;border-color:var(--red)}
+.row{display:flex;gap:18px;justify-content:flex-end;align-items:center}
+.row button{font-weight:700;padding:10px 0}
+#saveTok{background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px}
+
+/* ---------- Karaoké ---------- */
+#player header{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--rule)}
+.icon{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;flex:none}
+#back{color:var(--ink)}
 #now{min-width:0;flex:1}
-#now b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#now small{color:var(--dim)}
-#relisten{width:44px;height:44px;border-radius:50%;background:#33275A;font-size:1.2rem;flex:none;position:relative}
-#relisten.rec::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--spot);animation:pulse 1.2s ease-out infinite}
-#hint{color:var(--dim);font-size:.85rem;text-align:center;padding:6px 16px 0}
-#lyrics{flex:1;overflow-y:auto;padding:40vh 22px;scroll-behavior:smooth}
-.line{display:block;width:100%;text-align:left;font-size:clamp(1.3rem,5.4vw,2rem);font-weight:600;line-height:1.25;color:var(--dim);opacity:.45;padding:10px 0;transition:color .25s,opacity .25s,transform .25s;transform-origin:left center}
-.line.past{opacity:.25}
-.line.on{color:var(--ink);opacity:1;transform:scale(1.06)}
-.line.on::before{content:"";display:inline-block;width:.35em;height:.35em;border-radius:50%;background:var(--spot);margin-right:.35em;vertical-align:.2em;box-shadow:0 0 12px var(--spot)}
-.plain{white-space:pre-wrap;font-size:1.2rem;line-height:1.6;padding-top:0}
-#controls{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;background:var(--stage-2)}
-.ctl{padding:10px 12px;border-radius:12px;background:#33275A;font-weight:600;min-width:52px}
-#play{background:var(--spot);color:var(--stage);font-weight:800;border-radius:50%;width:64px;height:64px;font-size:1.5rem;flex:none}
-.off{display:flex;align-items:center;gap:6px}
-#offv{min-width:58px;text-align:center;font-variant-numeric:tabular-nums;color:var(--dim);font-size:.9rem}
-#clock{font-variant-numeric:tabular-nums;color:var(--dim);min-width:52px;text-align:right}
+#now b{display:block;font-family:var(--serif);font-weight:400;font-size:1.35rem;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#now small{color:var(--muted);font-size:.85rem}
+#relisten{border:1.5px solid var(--ink);position:relative}
+#relisten::before{content:"";width:12px;height:12px;border-radius:50%;background:var(--red)}
+#relisten.on::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--red);animation:ring 1.3s ease-out infinite}
+#hint{color:var(--muted);font-size:.85rem;text-align:center;padding:8px 16px 0}
+#lyrics{flex:1;overflow-y:auto;padding:38vh 24px;scroll-behavior:smooth;
+  -webkit-mask-image:linear-gradient(transparent,#000 18%,#000 82%,transparent);mask-image:linear-gradient(transparent,#000 18%,#000 82%,transparent)}
+.line{display:block;width:100%;text-align:left;font-family:var(--serif);font-size:clamp(1.7rem,7vw,2.6rem);line-height:1.12;color:var(--muted);opacity:.55;
+  padding:9px 0 9px 16px;border-left:3px solid transparent;transition:color .3s,opacity .3s,border-color .3s}
+.line.past{opacity:.3}
+.line.on{color:var(--ink);opacity:1;border-left-color:var(--red)}
+.line.gap{font-style:italic;font-size:1.4rem}
+.plain{white-space:pre-wrap;font-family:var(--serif);font-size:1.45rem;line-height:1.45;padding-top:24px;-webkit-mask-image:none;mask-image:none}
+#controls{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:12px 14px;border-top:1px solid var(--rule)}
+.ctl{height:40px;padding:0 10px;border-radius:999px;border:1.5px solid var(--rule);font-weight:500;font-size:.9rem;font-variant-numeric:tabular-nums}
+#play{width:56px;height:56px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;flex:none}
+.off{display:flex;align-items:center;gap:4px}
+#offv{min-width:46px;text-align:center;font-variant-numeric:tabular-nums;color:var(--muted);font-size:.85rem}
+#clock{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.9rem;min-width:34px;text-align:right}
 
-@media (prefers-reduced-motion:reduce){#lyrics{scroll-behavior:auto}.line{transition:none}#listen.rec .mic::after,#relisten.rec::after{animation:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){#lyrics{scroll-behavior:auto}.line{transition:none}#listen.on .rec::after,#relisten.on::after{animation:none;opacity:1}}
 </style>
 </head>
 <body>
 
-<section id="search" class="view">
-  <div class="top">
-    <h1>Chante-la.<span>Fais écouter la musique, ou tape un titre.</span></h1>
-    <button id="gear" aria-label="Réglages">⚙︎</button>
+<section id="home" class="view">
+  <div class="wrap">
+    <div class="bar"><span>Karaoké</span><button id="keyBtn">Clé perso</button></div>
+    <h1>Chante<i>-</i>la.</h1>
+    <p class="lede">Fais écouter la musique au téléphone. Les paroles démarrent pile au bon moment.</p>
+
+    <button id="listen">
+      <span class="rec" aria-hidden="true"></span>
+      <span><b id="listenTitle">Écouter la musique</b><small id="listenSub">8 secondes d'écoute, puis les paroles</small></span>
+    </button>
+    <div class="quota" id="quota" hidden>
+      <div class="ticks" id="ticks" aria-hidden="true"></div>
+      <span id="quotaText"></span>
+    </div>
+
+    <div class="or">ou</div>
+    <form id="f">
+      <input id="q" type="search" placeholder="Titre et artiste" autocomplete="off" enterkeyhint="search" aria-label="Titre et artiste">
+      <button class="go" type="submit">Chercher</button>
+    </form>
+    <p id="status" role="status"></p>
   </div>
-  <button id="listen">
-    <span class="mic" aria-hidden="true">🎤</span>
-    <span><b id="listenTitle">Reconnaître la musique</b><small id="listenSub">Écoute 8 secondes, puis lance les paroles au bon moment</small></span>
-  </button>
-  <form id="f">
-    <input id="q" type="search" placeholder="Titre et artiste" autocomplete="off" enterkeyhint="search" aria-label="Titre et artiste">
-    <button class="btn-main" type="submit">Chercher</button>
-  </form>
-  <p id="status" role="status"></p>
-  <ul id="results"></ul>
+  <ul id="results" class="wrap"></ul>
 </section>
 
 <section id="player" class="view" hidden>
   <header>
-    <button id="back" aria-label="Retour à l'accueil">←</button>
+    <button id="back" class="icon" aria-label="Retour">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
     <div id="now"><b id="t-title"></b><small id="t-artist"></small></div>
-    <button id="relisten" aria-label="Réécouter pour recaler ou changer de musique">🎤</button>
+    <button id="relisten" class="icon" aria-label="Réécouter pour recaler"></button>
   </header>
-  <p id="hint">Décalé ? Touche la ligne qu'on entend, ou réécoute avec 🎤.</p>
+  <p id="hint"></p>
   <div id="lyrics"></div>
   <div id="controls">
-    <button class="ctl" id="restart" aria-label="Revenir au début">⟲</button>
+    <button class="ctl" id="restart" aria-label="Revenir au début">Début</button>
     <div class="off">
-      <button class="ctl" id="minus" aria-label="Reculer de 0,5 seconde">−½</button>
+      <button class="ctl" id="minus" aria-label="Reculer de 0,5 seconde">-0,5</button>
       <span id="offv">0,0 s</span>
-      <button class="ctl" id="plus" aria-label="Avancer de 0,5 seconde">+½</button>
+      <button class="ctl" id="plus" aria-label="Avancer de 0,5 seconde">+0,5</button>
     </div>
     <span id="clock">0:00</span>
-    <button id="play" aria-label="Lecture">▶</button>
+    <button id="play" aria-label="Lecture"></button>
   </div>
 </section>
 
-<div id="settings" hidden>
-  <div class="sheet" role="dialog" aria-labelledby="setTitle">
-    <h2 id="setTitle">Clé de reconnaissance</h2>
-    <p>Optionnel : la reconnaissance marche sans clé (limite quotidienne). Pour un usage illimité, crée un compte sur <a href="https://dashboard.audd.io" target="_blank" rel="noopener">dashboard.audd.io</a>, copie ton API token et colle-le ici. Il reste uniquement sur cet appareil.</p>
+<div id="sheet" hidden>
+  <div class="in" role="dialog" aria-labelledby="sheetTitle">
+    <h2 id="sheetTitle">Clé perso</h2>
+    <p>Sans clé, l'app partage 5 écoutes par jour avec tout le monde. Avec ta propre clé <a href="https://dashboard.audd.io" target="_blank" rel="noopener">AudD</a>, c'est sans limite. Elle reste sur ce téléphone.</p>
     <input id="token" type="text" placeholder="API token AudD" autocomplete="off" spellcheck="false">
     <div class="row">
-      <button id="closeSet">Annuler</button>
+      <button id="closeSheet">Annuler</button>
       <button id="saveTok">Enregistrer</button>
     </div>
   </div>
@@ -144,13 +177,17 @@ form{display:flex;gap:8px}
 const $ = s => document.querySelector(s);
 const LRC = "https://lrclib.net/api/search?";
 const REC_SECONDS = 8;
-// URL de ton mini-serveur Cloudflare (à remplacer après le déploiement)
+// URL du mini-serveur Cloudflare (garde la clé AudD et compte les écoutes du jour)
 const WORKER_URL = "https://karaoke-audd.TONPSEUDO.workers.dev";
+const HAS_WORKER = !WORKER_URL.includes("TONPSEUDO");
+
+const ICON_PLAY = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>';
+const ICON_PAUSE = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="5" width="4" height="14" rx="1"/><rect x="13.5" y="5" width="4" height="14" rx="1"/></svg>';
+const HINT = "Décalé ? Touche la ligne qu'on entend.";
 
 let lines = [], els = [], cur = -1;
 let playing = false, startAt = 0, pausedAt = 0, offset = 0, raf = 0, lock = null, busy = false;
 
-// ---------- Stockage local (clé AudD) ----------
 const store = {
   get(k){ try { return localStorage.getItem(k) || ""; } catch(e){ return ""; } },
   set(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
@@ -169,36 +206,54 @@ async function fetchRetry(url, opts, tries = 3) {
     if (i < tries) await new Promise(r => setTimeout(r, 1500 * i));
   }
 }
-
 function setStatus(msg, err) { const s = $("#status"); s.textContent = msg; s.classList.toggle("err", !!err); }
 
-// ---------- Recherche manuelle ----------
+// ---------- Compteur d'écoutes du jour ----------
+function showQuota(remaining, limit) {
+  const q = $("#quota");
+  if (store.get("auddToken")) { q.hidden = false; $("#ticks").innerHTML = ""; $("#quotaText").textContent = "Clé perso, écoutes illimitées"; return; }
+  if (remaining == null) { q.hidden = true; return; }
+  q.hidden = false;
+  $("#ticks").innerHTML = Array.from({ length: limit }, (_, i) => `<span class="${i < remaining ? "" : "used"}"></span>`).join("");
+  $("#quotaText").textContent = remaining === 0
+    ? "Plus d'écoute aujourd'hui, reviens demain"
+    : `${remaining} écoute${remaining > 1 ? "s" : ""} sur ${limit} aujourd'hui`;
+}
+async function loadQuota() {
+  if (store.get("auddToken")) return showQuota();
+  if (!HAS_WORKER) return showQuota(null);
+  try { const d = await (await fetch(WORKER_URL)).json(); showQuota(d.remaining, d.limit); }
+  catch (e) { showQuota(null); }
+}
+
+// ---------- Recherche par titre ----------
 $("#f").addEventListener("submit", async e => {
   e.preventDefault();
   const q = $("#q").value.trim();
   if (!q) return;
+  $("#q").blur();
   setStatus("Recherche…");
   $("#results").innerHTML = "";
   try {
     const data = await fetchRetry(LRC + "q=" + encodeURIComponent(q));
-    if (!data.length) return setStatus("Aucun résultat. Essaie avec le titre et l'artiste.", true);
+    if (!data.length) return setStatus("Rien trouvé. Essaie avec le titre et l'artiste.", true);
     data.sort((a, b) => !!b.syncedLyrics - !!a.syncedLyrics);
     setStatus(data.length + " résultat" + (data.length > 1 ? "s" : ""));
     for (const s of data.slice(0, 25)) {
       const li = document.createElement("li");
       const b = document.createElement("button");
-      b.innerHTML = `<span class="r-title"></span><span class="r-meta"></span><span class="r-tag"></span>`;
+      b.innerHTML = `<span class="r-title"></span><span class="r-tag"></span><span class="r-meta"></span>`;
       b.querySelector(".r-title").textContent = s.trackName;
-      b.querySelector(".r-meta").textContent = s.artistName + (s.duration ? " — " + fmt(s.duration) : "");
+      b.querySelector(".r-meta").textContent = s.artistName + (s.duration ? " · " + fmt(s.duration) : "");
       const tag = b.querySelector(".r-tag");
       if (s.syncedLyrics) { tag.textContent = "synchro"; tag.classList.add("sync"); }
-      else tag.textContent = s.instrumental ? "instru" : "texte seul";
-      b.onclick = () => { open(s); };
+      else tag.textContent = s.instrumental ? "instru" : "texte";
+      b.onclick = () => open(s);
       li.appendChild(b);
       $("#results").appendChild(li);
     }
   } catch (err) {
-    setStatus(navigator.onLine ? "LRCLIB est surchargé en ce moment. Réessaie dans quelques minutes." : "Pas de connexion internet.", true);
+    setStatus(navigator.onLine ? "Le serveur de paroles est surchargé. Réessaie dans quelques minutes." : "Pas de connexion internet.", true);
   }
 });
 
@@ -220,13 +275,13 @@ async function record(seconds) {
 }
 
 async function recognize(say) {
-  // Clé perso (réglages) => appel direct à AudD ; sinon => mini-serveur qui cache la clé
+  // Clé perso => appel direct à AudD ; sinon => mini-serveur (clé cachée, 5 écoutes/jour)
   const token = store.get("auddToken");
-  if (!token && WORKER_URL.includes("TONPSEUDO")) { openSettings(); throw new Error("Reconnaissance pas encore configurée."); }
+  if (!token && !HAS_WORKER) { openSheet(); throw new Error("La reconnaissance n'est pas encore configurée."); }
 
   let clip;
-  try { say("J'écoute…", `Approche le téléphone de la musique (${REC_SECONDS} s)`); clip = await record(REC_SECONDS); }
-  catch (e) { throw new Error("Accès au micro refusé. Autorise le micro pour ce site dans les réglages du navigateur."); }
+  try { say("J'écoute…", `Approche le téléphone de la musique, ${REC_SECONDS} secondes`); clip = await record(REC_SECONDS); }
+  catch (e) { throw new Error("Micro refusé. Autorise le micro pour ce site dans les réglages du navigateur."); }
 
   say("Je cherche…", "Identification du morceau");
   const fd = new FormData();
@@ -235,13 +290,14 @@ async function recognize(say) {
   let r;
   try { r = await (await fetch(token ? "https://api.audd.io/" : WORKER_URL, { method: "POST", body: fd })).json(); }
   catch (e) { throw new Error("Impossible de joindre le serveur de reconnaissance. Vérifie ta connexion."); }
+  if (r.remaining != null) showQuota(r.remaining, r.limit);
   if (r.status === "error") throw new Error(r.error?.error_message || "Erreur de reconnaissance.");
-  if (!r.result) throw new Error("Morceau pas reconnu. Rapproche-toi de la musique et réessaie.");
+  if (!r.result) throw new Error("Pas reconnu. Rapproche-toi de la musique et réessaie.");
 
   const { artist, title, timecode } = r.result;
-  say("Trouvé !", `${title} — ${artist}. Je charge les paroles…`);
+  say("Trouvé.", `${title}, ${artist}. Chargement des paroles…`);
   const song = await findLyrics(artist, title);
-  if (!song) throw new Error(`Reconnu : ${title} — ${artist}, mais pas de paroles sur LRCLIB.`);
+  if (!song) throw new Error(`C'est ${title} de ${artist}, mais ses paroles ne sont pas disponibles.`);
   return { song, pos: tc(timecode), t0: clip.t0 };
 }
 
@@ -267,7 +323,7 @@ async function listenAndPlay(fromPlayer) {
   if (busy) return;
   busy = true;
   const btn = fromPlayer ? $("#relisten") : $("#listen");
-  btn.classList.add("rec"); btn.disabled = true;
+  btn.classList.add("on"); btn.disabled = true;
   const say = fromPlayer
     ? (a, b) => { $("#hint").hidden = false; $("#hint").textContent = a + " " + b; }
     : (a, b) => { $("#listenTitle").textContent = a; $("#listenSub").textContent = b; setStatus(""); };
@@ -275,32 +331,32 @@ async function listenAndPlay(fromPlayer) {
     const { song, pos, t0 } = await recognize(say);
     open(song);
     if (lines.length) {
-      // position actuelle = position du début de l'extrait + temps écoulé depuis
+      // position actuelle = début de l'extrait dans le morceau + temps écoulé depuis
       pausedAt = pos + (performance.now() - t0) / 1000;
       play();
     }
   } catch (e) {
-    if (fromPlayer) { $("#hint").textContent = e.message; }
+    if (fromPlayer) $("#hint").textContent = e.message;
     else setStatus(e.message, true);
   } finally {
     busy = false;
-    btn.classList.remove("rec"); btn.disabled = false;
-    $("#listenTitle").textContent = "Reconnaître la musique";
-    $("#listenSub").textContent = "Écoute 8 secondes, puis lance les paroles au bon moment";
+    btn.classList.remove("on"); btn.disabled = false;
+    $("#listenTitle").textContent = "Écouter la musique";
+    $("#listenSub").textContent = "8 secondes d'écoute, puis les paroles";
   }
 }
 $("#listen").onclick = () => listenAndPlay(false);
 $("#relisten").onclick = () => listenAndPlay(true);
 
-// ---------- Réglages ----------
-function openSettings() { $("#token").value = store.get("auddToken"); $("#settings").hidden = false; $("#token").focus(); }
-$("#gear").onclick = openSettings;
-$("#closeSet").onclick = () => $("#settings").hidden = true;
-$("#settings").onclick = e => { if (e.target.id === "settings") $("#settings").hidden = true; };
+// ---------- Clé perso ----------
+function openSheet() { $("#token").value = store.get("auddToken"); $("#sheet").hidden = false; $("#token").focus(); }
+$("#keyBtn").onclick = openSheet;
+$("#closeSheet").onclick = () => $("#sheet").hidden = true;
+$("#sheet").onclick = e => { if (e.target.id === "sheet") $("#sheet").hidden = true; };
 $("#saveTok").onclick = () => {
   store.set("auddToken", $("#token").value.trim());
-  $("#settings").hidden = true;
-  setStatus("Clé enregistrée. Appuie sur 🎤 pour reconnaître une musique.");
+  $("#sheet").hidden = true;
+  loadQuota();
 };
 
 // ---------- Parsing LRC ----------
@@ -327,12 +383,12 @@ function open(song) {
   const synced = lines.length > 0;
   $("#controls").hidden = !synced;
   $("#hint").hidden = !synced;
-  $("#hint").textContent = "Décalé ? Touche la ligne qu'on entend, ou réécoute avec 🎤.";
+  $("#hint").textContent = HINT;
   if (synced) {
     lines.forEach((l, i) => {
       const b = document.createElement("button");
-      b.className = "line";
-      b.textContent = l.text || "♪";
+      b.className = "line" + (l.text ? "" : " gap");
+      b.textContent = l.text || "(musique)";
       b.onclick = () => jump(i);
       box.appendChild(b); els.push(b);
     });
@@ -340,7 +396,7 @@ function open(song) {
     box.classList.add("plain");
     box.textContent = song.plainLyrics || "Pas de paroles pour ce morceau.";
   }
-  $("#search").hidden = true; $("#player").hidden = false;
+  $("#home").hidden = true; $("#player").hidden = false;
   box.scrollTop = 0;
 }
 
@@ -360,20 +416,20 @@ function tick() {
   if (playing) raf = requestAnimationFrame(tick);
 }
 
+function setPlayIcon() { $("#play").innerHTML = playing ? ICON_PAUSE : ICON_PLAY; $("#play").setAttribute("aria-label", playing ? "Pause" : "Lecture"); }
 function play() {
   startAt = performance.now() - pausedAt * 1000;
-  playing = true; $("#play").textContent = "❚❚"; $("#play").setAttribute("aria-label", "Pause");
+  playing = true; setPlayIcon();
   wake(true); cur = -1; tick();
 }
 function stop() {
   if (playing) pausedAt = now();
-  playing = false; cancelAnimationFrame(raf);
-  $("#play").textContent = "▶"; $("#play").setAttribute("aria-label", "Lecture");
+  playing = false; cancelAnimationFrame(raf); setPlayIcon();
   wake(false);
 }
 function reset() { pausedAt = 0; offset = 0; cur = -1; showOff(); $("#clock").textContent = "0:00"; }
 
-// Touche une ligne = "on est ici maintenant"
+// Toucher une ligne = "on est ici maintenant"
 function jump(i) {
   offset = lines[i].t - now();
   showOff(); cur = -1;
@@ -386,7 +442,7 @@ $("#play").onclick = () => playing ? stop() : play();
 $("#plus").onclick = () => nudge(0.5);
 $("#minus").onclick = () => nudge(-0.5);
 $("#restart").onclick = () => { const was = playing; stop(); reset(); els.forEach(e => e.classList.remove("on", "past")); $("#lyrics").scrollTop = 0; if (was) play(); };
-$("#back").onclick = () => { stop(); $("#player").hidden = true; $("#search").hidden = false; };
+$("#back").onclick = () => { stop(); $("#player").hidden = true; $("#home").hidden = false; loadQuota(); };
 
 // Écran allumé pendant la lecture
 async function wake(on) {
@@ -399,6 +455,9 @@ document.addEventListener("visibilitychange", () => { if (playing && document.vi
 
 function fmt(s) { s = Math.floor(s); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }
 function tc(str) { if (!str) return 0; return String(str).split(":").reduce((a, v) => a * 60 + parseFloat(v), 0); }
+
+setPlayIcon();
+loadQuota();
 </script>
 </body>
 </html>

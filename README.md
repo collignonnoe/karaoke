@@ -1,4 +1,4 @@
-# 🎤 Chante-la — karaoké web
+# Chante-la, karaoké web
 
 Fais écouter une musique au téléphone : l'app la reconnaît, récupère les paroles et les fait défiler **synchronisées, au bon moment du morceau**, même si la chanson a déjà commencé.
 
@@ -19,14 +19,14 @@ Fais écouter une musique au téléphone : l'app la reconnaît, récupère les p
 ```
 Navigateur (GitHub Pages)                       Cloudflare Worker                AudD
   MediaRecorder ── extrait audio ──────────────▶  vérifie l'origine (CORS)  ───▶  reconnaissance
-                                                  quota/jour (KV, global + IP)    (clé API secrète)
+                                                  quota de 5 écoutes/jour (KV)   (clé API secrète)
                 ◀──────── titre, artiste, position ──────────────────────────────
   LRCLIB ◀── recherche des paroles synchronisées
   parsing LRC → chrono → affichage
 ```
 
 - **Front** : un seul fichier `index.html` (HTML/CSS/JS vanilla, sans dépendance).
-- **Back** : `server/worker.js`, un proxy serverless qui garde la clé AudD côté serveur. Il n'accepte que les requêtes venant du site et limite les reconnaissances par jour (quota global + quota par IP, stockés dans Workers KV).
+- **Back** : `server/worker.js`, un proxy serverless qui garde la clé AudD côté serveur. Il n'accepte que les requêtes venant du site et limite la démo à 5 reconnaissances par jour (compteur stocké dans Workers KV, affiché en direct dans l'app).
 
 ## Stack
 
