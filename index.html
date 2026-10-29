@@ -30,7 +30,7 @@ svg{display:block}
 
 /* ---------- Accueil ---------- */
 #home .bar{display:flex;justify-content:space-between;align-items:center;padding:16px 0 0;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-#keyBtn{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:6px 0;border-bottom:1px solid var(--rule)}
+#code{text-decoration:none;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:6px 0;border-bottom:1px solid var(--rule)}
 #home h1{font-family:var(--serif);font-weight:400;font-size:clamp(3.2rem,15vw,5.2rem);line-height:.9;letter-spacing:-.02em;margin:28px 0 10px}
 #home h1 i{color:var(--red)}
 .lede{color:var(--muted);font-size:1.02rem;line-height:1.45;max-width:30ch;margin-bottom:28px}
@@ -72,16 +72,6 @@ form:focus-within{border-color:var(--red)}
 .r-tag{grid-column:3;grid-row:1;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .r-tag.sync{color:var(--red-ink)}
 
-/* ---------- Clé perso ---------- */
-#sheet{position:fixed;inset:0;background:rgba(28,26,22,.35);display:grid;place-items:end center;z-index:10}
-#sheet .in{background:var(--paper);width:100%;max-width:620px;border-top:1.5px solid var(--ink);padding:22px 20px calc(22px + env(safe-area-inset-bottom,0px))}
-#sheet h2{font-family:var(--serif);font-weight:400;font-size:1.8rem;margin-bottom:6px}
-#sheet p{color:var(--muted);line-height:1.45;margin-bottom:16px;font-size:.95rem}
-#token{width:100%;background:transparent;border:0;border-bottom:1.5px solid var(--ink);padding:10px 0;margin-bottom:18px;font-family:ui-monospace,Menlo,monospace;font-size:.9rem}
-#token:focus{outline:none;border-color:var(--red)}
-.row{display:flex;gap:18px;justify-content:flex-end;align-items:center}
-.row button{font-weight:700;padding:10px 0}
-#saveTok{background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px}
 
 /* ---------- Karaoké ---------- */
 #player header{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--rule)}
@@ -116,7 +106,7 @@ form:focus-within{border-color:var(--red)}
 
 <section id="home" class="view">
   <div class="wrap">
-    <div class="bar"><span>Karaoké</span><button id="keyBtn">Clé perso</button></div>
+    <div class="bar"><span>Karaoké</span><a id="code" href="https://github.com/collignonnoe/karaoke" target="_blank" rel="noopener">Code</a></div>
     <h1>Chante<i>-</i>la.</h1>
     <p class="lede">Fais écouter la musique au téléphone. Les paroles démarrent pile au bon moment.</p>
 
@@ -161,24 +151,13 @@ form:focus-within{border-color:var(--red)}
   </div>
 </section>
 
-<div id="sheet" hidden>
-  <div class="in" role="dialog" aria-labelledby="sheetTitle">
-    <h2 id="sheetTitle">Clé perso</h2>
-    <p>Sans clé, l'app partage 5 écoutes par jour avec tout le monde. Avec ta propre clé <a href="https://dashboard.audd.io" target="_blank" rel="noopener">AudD</a>, c'est sans limite. Elle reste sur ce téléphone.</p>
-    <input id="token" type="text" placeholder="API token AudD" autocomplete="off" spellcheck="false">
-    <div class="row">
-      <button id="closeSheet">Annuler</button>
-      <button id="saveTok">Enregistrer</button>
-    </div>
-  </div>
-</div>
-
+<script src="shazam-sig.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const LRC = "https://lrclib.net/api/search?";
 const REC_SECONDS = 8;
-// URL du mini-serveur Cloudflare (garde la clé AudD et compte les écoutes du jour)
-const WORKER_URL = "https://karaoke-audd.TONPSEUDO.workers.dev";
+// URL du mini-serveur Cloudflare (relaie l'empreinte à Shazam et compte les écoutes du jour)
+const WORKER_URL = "https://karaoke.TONPSEUDO.workers.dev";
 const HAS_WORKER = !WORKER_URL.includes("TONPSEUDO");
 
 const ICON_PLAY = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>';
@@ -187,11 +166,6 @@ const HINT = "Décalé ? Touche la ligne qu'on entend.";
 
 let lines = [], els = [], cur = -1;
 let playing = false, startAt = 0, pausedAt = 0, offset = 0, raf = 0, lock = null, busy = false;
-
-const store = {
-  get(k){ try { return localStorage.getItem(k) || ""; } catch(e){ return ""; } },
-  set(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
-};
 
 // ---------- Réseau ----------
 async function fetchRetry(url, opts, tries = 3) {
@@ -211,7 +185,6 @@ function setStatus(msg, err) { const s = $("#status"); s.textContent = msg; s.cl
 // ---------- Compteur d'écoutes du jour ----------
 function showQuota(remaining, limit) {
   const q = $("#quota");
-  if (store.get("auddToken")) { q.hidden = false; $("#ticks").innerHTML = ""; $("#quotaText").textContent = "Clé perso, écoutes illimitées"; return; }
   if (remaining == null) { q.hidden = true; return; }
   q.hidden = false;
   $("#ticks").innerHTML = Array.from({ length: limit }, (_, i) => `<span class="${i < remaining ? "" : "used"}"></span>`).join("");
@@ -220,7 +193,6 @@ function showQuota(remaining, limit) {
     : `${remaining} écoute${remaining > 1 ? "s" : ""} sur ${limit} aujourd'hui`;
 }
 async function loadQuota() {
-  if (store.get("auddToken")) return showQuota();
   if (!HAS_WORKER) return showQuota(null);
   try { const d = await (await fetch(WORKER_URL)).json(); showQuota(d.remaining, d.limit); }
   catch (e) { showQuota(null); }
@@ -274,22 +246,36 @@ async function record(seconds) {
   return { blob: new Blob(chunks, { type: rec.mimeType || "audio/webm" }), t0 };
 }
 
+// Décode l'enregistrement en PCM 16 bits mono 16 kHz (format attendu par l'empreinte)
+async function toPCM16k(blob) {
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  const ctx = new Ctx();
+  const buf = await ctx.decodeAudioData(await blob.arrayBuffer());
+  ctx.close && ctx.close();
+  const off = new OfflineAudioContext(1, Math.ceil(buf.duration * 16000), 16000);
+  const src = off.createBufferSource(); src.buffer = buf; src.connect(off.destination); src.start();
+  const mono = (await off.startRendering()).getChannelData(0);
+  const pcm = new Int16Array(mono.length);
+  for (let i = 0; i < mono.length; i++) pcm[i] = Math.max(-32768, Math.min(32767, Math.round(mono[i] * 32767)));
+  return new Uint8Array(pcm.buffer);
+}
+
 async function recognize(say) {
-  // Clé perso => appel direct à AudD ; sinon => mini-serveur (clé cachée, 5 écoutes/jour)
-  const token = store.get("auddToken");
-  if (!token && !HAS_WORKER) { openSheet(); throw new Error("La reconnaissance n'est pas encore configurée."); }
+  if (!HAS_WORKER) throw new Error("La reconnaissance n'est pas encore configurée.");
 
   let clip;
   try { say("J'écoute…", `Approche le téléphone de la musique, ${REC_SECONDS} secondes`); clip = await record(REC_SECONDS); }
   catch (e) { throw new Error("Micro refusé. Autorise le micro pour ce site dans les réglages du navigateur."); }
 
   say("Je cherche…", "Identification du morceau");
-  const fd = new FormData();
-  if (token) fd.append("api_token", token);
-  fd.append("file", clip.blob, "clip." + (clip.blob.type.includes("mp4") ? "m4a" : "webm"));
+  let sig;
+  try { sig = ShazamSig.signature(await toPCM16k(clip.blob)); } catch (e) {}
+  if (!sig) throw new Error("Enregistrement illisible. Réessaie.");
+
   let r;
-  try { r = await (await fetch(token ? "https://api.audd.io/" : WORKER_URL, { method: "POST", body: fd })).json(); }
-  catch (e) { throw new Error("Impossible de joindre le serveur de reconnaissance. Vérifie ta connexion."); }
+  try {
+    r = await (await fetch(WORKER_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(sig) })).json();
+  } catch (e) { throw new Error("Impossible de joindre le serveur de reconnaissance. Vérifie ta connexion."); }
   if (r.remaining != null) showQuota(r.remaining, r.limit);
   if (r.status === "error") throw new Error(r.error?.error_message || "Erreur de reconnaissance.");
   if (!r.result) throw new Error("Pas reconnu. Rapproche-toi de la musique et réessaie.");
@@ -348,16 +334,6 @@ async function listenAndPlay(fromPlayer) {
 $("#listen").onclick = () => listenAndPlay(false);
 $("#relisten").onclick = () => listenAndPlay(true);
 
-// ---------- Clé perso ----------
-function openSheet() { $("#token").value = store.get("auddToken"); $("#sheet").hidden = false; $("#token").focus(); }
-$("#keyBtn").onclick = openSheet;
-$("#closeSheet").onclick = () => $("#sheet").hidden = true;
-$("#sheet").onclick = e => { if (e.target.id === "sheet") $("#sheet").hidden = true; };
-$("#saveTok").onclick = () => {
-  store.set("auddToken", $("#token").value.trim());
-  $("#sheet").hidden = true;
-  loadQuota();
-};
 
 // ---------- Parsing LRC ----------
 function parseLRC(lrc) {

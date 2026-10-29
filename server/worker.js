@@ -1,14 +1,42 @@
 // Mini-serveur Cloudflare Worker pour l'app Karaoké
-// - garde la clé AudD secrète (variable AUDD_TOKEN, jamais envoyée au navigateur)
+// - reçoit l'empreinte audio calculée dans le navigateur (shazam-sig.js)
+// - l'envoie au service de reconnaissance de Shazam (non officiel, aucune clé)
 // - n'accepte que les requêtes venant du site GitHub Pages
 // - limite à DAILY_TOTAL reconnaissances par jour, tous visiteurs confondus
 //
-// GET  /  -> { remaining, limit }   (combien d'écoutes il reste aujourd'hui)
-// POST /  -> réponse AudD + remaining   (corps : FormData avec "file")
+// GET  /  -> { remaining, limit }
+// POST /  -> { status, result: { title, artist, timecode }, remaining, limit }
+//            corps JSON : { uri, samplems }
 
 const ALLOWED_ORIGIN = "https://collignonnoe.github.io";
 const DAILY_TOTAL = 5;
-const MAX_BYTES = 2_000_000;
+
+const uuid = () => crypto.randomUUID().toUpperCase();
+
+async function shazam(uri, samplems) {
+  const url = `https://amp.shazam.com/discovery/v5/fr/FR/android/-/tag/${uuid()}/${uuid()}` +
+    "?sync=true&webv3=true&sampling=true&connected=&shazamapiversion=v3&sharehub=true&video=v3";
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "*/*",
+      "Accept-Language": "fr",
+      "X-Shazam-Platform": "IPHONE",
+      "X-Shazam-AppVersion": "14.1.0",
+      "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 13; Pixel 7 Build/TQ3A.230805.001)",
+    },
+    body: JSON.stringify({
+      timezone: "Europe/Paris",
+      signature: { uri, samplems },
+      timestamp: Date.now(),
+      context: {},
+      geolocation: {},
+    }),
+  });
+  if (!res.ok) throw new Error("shazam " + res.status);
+  return res.json();
+}
 
 export default {
   async fetch(req, env) {
@@ -32,28 +60,30 @@ export default {
 
     if (req.method === "GET") return json({ remaining: left, limit: DAILY_TOTAL });
     if (req.method !== "POST") return fail("Méthode non autorisée.", 405);
-
     if (left === 0) {
-      return fail(`Les ${DAILY_TOTAL} écoutes du jour sont parties. Reviens demain, ou cherche le titre à la main.`, 429, { remaining: 0 });
+      return fail(`Les ${DAILY_TOTAL} écoutes du jour sont parties. Reviens demain, ou cherche le titre à la main.`, 429, { remaining: 0, limit: DAILY_TOTAL });
     }
 
-    let file;
-    try { file = (await req.formData()).get("file"); } catch (e) {}
-    if (!file || typeof file === "string") return fail("Aucun extrait audio reçu.", 400);
-    if (file.size > MAX_BYTES) return fail("Extrait audio trop lourd.", 413);
-
-    const fd = new FormData();
-    fd.append("api_token", env.AUDD_TOKEN);
-    fd.append("file", file, file.name || "clip.webm");
+    let body;
+    try { body = await req.json(); } catch (e) {}
+    if (!body || typeof body.uri !== "string" || !body.uri.startsWith("data:audio/vnd.shazam.sig;base64,") ||
+        body.uri.length > 200_000 || !Number.isFinite(body.samplems)) {
+      return fail("Empreinte audio invalide.", 400);
+    }
 
     let data;
-    try {
-      data = await (await fetch("https://api.audd.io/", { method: "POST", body: fd })).json();
-    } catch (e) {
-      return fail("Le service de reconnaissance ne répond pas. Réessaie.", 502);
-    }
+    try { data = await shazam(body.uri, Math.round(body.samplems)); }
+    catch (e) { return fail("Le service de reconnaissance ne répond pas. Réessaie dans un moment.", 502); }
 
     await env.RL.put(key, String(used + 1), { expirationTtl: 172800 });
-    return json({ ...data, remaining: left - 1, limit: DAILY_TOTAL });
+    const meta = { remaining: left - 1, limit: DAILY_TOTAL };
+
+    const match = data.matches && data.matches[0];
+    if (!match || !data.track) return json({ status: "success", result: null, ...meta });
+    return json({
+      status: "success",
+      result: { title: data.track.title, artist: data.track.subtitle, timecode: match.offset || 0 },
+      ...meta,
+    });
   },
 };
